@@ -1,0 +1,25 @@
+name: Publicar release
+
+# Publica um release automaticamente quando uma tag "BogoLokov*" é enviada.
+# O .exe já vem pronto no repositório (o código-fonte fica privado) — a Action
+# só cria o release e anexa o executável. Assim o app atualiza sozinho.
+
+on:
+  push:
+    tags:
+      - 'BogoLokov*'
+
+permissions:
+  contents: write
+
+jobs:
+  publicar:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Criar release e anexar o .exe
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ github.ref_name }}
+          name: ${{ github.ref_name }}
+          files: BogoLoko.exe
