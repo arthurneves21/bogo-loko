@@ -1,13 +1,12 @@
 name: Publicar release
 
-# Publica um release automaticamente quando uma tag "BogoLokov*" é enviada.
-# O .exe já vem pronto no repositório (o código-fonte fica privado) — a Action
-# só cria o release e anexa o executável. Assim o app atualiza sozinho.
+# Dispara quando o arquivo VERSION muda no main. O próprio GitHub cria a tag
+# BogoLokov<versão> e o release com o .exe (o código-fonte fica fora do repo).
 
 on:
   push:
-    tags:
-      - 'BogoLokov*'
+    branches: [ main ]
+    paths: [ 'VERSION' ]
 
 permissions:
   contents: write
@@ -17,9 +16,12 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+      - id: v
+        run: echo "ver=$(tr -d '[:space:]' < VERSION)" >> "$GITHUB_OUTPUT"
       - name: Criar release e anexar o .exe
         uses: softprops/action-gh-release@v2
         with:
-          tag_name: ${{ github.ref_name }}
-          name: ${{ github.ref_name }}
+          tag_name: BogoLokov${{ steps.v.outputs.ver }}
+          name: BogoLokov${{ steps.v.outputs.ver }}
           files: BogoLoko.exe
+          fail_on_unmatched_files: true
